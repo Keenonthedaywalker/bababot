@@ -10,19 +10,26 @@ import os
 
 #The Token of your bot
 TOKEN = "1153795040:AAGTgpa0PmCVnk2CoDK_FWC-Xlam6mfrCxQ"
+#A variable for that token
 bot = telebot.TeleBot(TOKEN)
+#A Flask Server
 server = Flask(__name__)
+#Gets bot info
 botInfo = bot.get_me()
 
-#Prints some info on your bot
+#Prints that bot info
 print(botInfo)
 
+#Not quite sure what these do, but they are needed...
 @bot.message_handler()
 def babaIntro(intro):
+    #intro.chat.id gets the user's id and with that it can send him/her messages.
     bot.send_message(intro.chat.id, "Tester")
 
+#commands=['tasks'] will be used as a special command on Telegram, i.e. /tasks, /start, /whatever
 @bot.message_handler(commands=['tasks'])
 def babaTasks(tasks):
+    #reply_to replies to the users message
     bot.reply_to(tasks.chat.id, "/sit\n/sleep\n/speak")
     bot.reply_to(tasks.chat.id, "Use /info to see info on the tasks")
 
@@ -33,6 +40,7 @@ def babaInfo(info):
 @bot.message_handler(commands=['sit'])
 def babaSit(sit):
     photo = open('babaSit.png', 'rb')
+    #send_photo sends a photo
     bot.send_photo(sit.chat.id, photo)
    
 @bot.message_handler(commands=['sleep'])
@@ -44,36 +52,36 @@ def babaSleep(sleep):
 def babaSpeak(speak):
     bot.reply_to(speak, "Woef")
     audio = open('babaBlaf.mp3', 'rb')
+    #send_audio sends audio files
     bot.send_audio(speak.chat.id, audio)
 
 
-
+#Selects a sentence at random and then sends that sentence to the user
 def timeIsEpic():
      wordList = ["Woef", "Ek's honger. Voer My.", "AANDAG! EK SOEK AANDAG!", "Ruik ek iets lekker?", "Kos tyd! Word Wakker, plebians!", "Woef, Woef"]
      randWord = random.choice(wordList)
-     bot.send_message(-446777587, randWord)
+     bot.send_message("""Insert your own token here""", randWord)
 
+#Stores the time 
 timeList = ["9:00", "10:00", "11:00", "12:00", "13:00", "14:00",
             "15:00", "16:00", "17:00", "18:00", "19:00", "20:00"]
 
 def earlyMorningBaba():
     photo = open('letMeOut.jpg', 'rb')
-    bot.send_photo(-446777587, photo)
+    bot.send_photo("""Insert your own token here""", photo)
 
-
+#I use the Schedule module to send periodical messages
 def schedule_checker():
     while True:
         schedule.run_pending()
         sleep(0.3)
 
-#def test_message():
-   # bot.send_message(988746758, "Time Test!")
-
 schedule.every().day.at(random.choice(timeList)).do(timeIsEpic)
-schedule.every().day.at("06:00").do()
+schedule.every().day.at("06:00").do(earlyMorningBaba)
 
 Thread(target=schedule_checker).start()
 
+#This is how I run my bot on a server
 @server.route('/' + TOKEN, methods=['POST'])
 def getMessage():
     bot.process_new_updates([telebot.types.Update.de_json(request.stream.read().decode("utf-8"))])
